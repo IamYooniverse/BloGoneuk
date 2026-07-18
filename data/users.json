@@ -1,0 +1,18 @@
+[
+  {
+    "id": "468a7dad-0739-44e9-9905-79b3c1c21a46",
+    "name": "테스트",
+    "username": "hashtest",
+    "passwordSalt": "0b778c10036e809447f1d9c1178750c7",
+    "passwordHash": "7ba9f13d181eddfa3ad85411bfacb526f1f14b7c3d92ff7bf7b4fc26fc4120783467583ba3529e01749dfeb40f568cc3dd3f2b1bae1310496f4008883c467433",
+    "createdAt": "2026-07-18T10:12:25.528Z"
+  },
+  {
+    "id": "e899cb43-2061-4de4-a1d8-a0fdbcceb868",
+    "name": "고늑",
+    "username": "goneuk",
+    "passwordSalt": "88b4eb1db2f2c1c08b8a811c1d6faa70",
+    "passwordHash": "6346505a3e503eba41298f1e0857df049c91e9604c5598f76bf50759badf79bbacb441518f80db6e48ff48d530a89a2fc9fc0808b355843c79807633e544a9b8",
+    "createdAt": "2026-07-18T10:14:50.748Z"
+  }
+]

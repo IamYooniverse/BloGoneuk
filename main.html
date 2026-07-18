@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloGoneuk | 고늑블로그</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0b0d11;
+            --panel: rgba(21, 25, 32, 0.95);
+            --panel-soft: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f5f7fb;
+            --muted: #aab4c3;
+            --accent: #74d8ff;
+            --accent-strong: #4fa7ff;
+            --danger: #ff7b7b;
+            --success: #79e29b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top, rgba(79, 167, 255, 0.18), transparent 28%),
+                radial-gradient(circle at right, rgba(116, 216, 255, 0.1), transparent 25%),
+                linear-gradient(180deg, #090b0f 0%, #11151c 100%);
+        }
+
+        .wrap {
+            width: min(1100px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 48px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 22px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            border-radius: 22px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+            margin-bottom: 22px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: -0.03em;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: var(--muted);
+        }
+
+        .userbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .user-chip {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(116, 216, 255, 0.12);
+            color: #c9efff;
+            border: 1px solid rgba(116, 216, 255, 0.18);
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .logout-button,
+        .danger-button {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .primary-button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: #07111e;
+        }
+
+        .notice {
+            margin-bottom: 18px;
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(116, 216, 255, 0.16);
+            background: rgba(116, 216, 255, 0.08);
+            color: #d9f4ff;
+            line-height: 1.6;
+        }
+
+        .notice.error {
+            color: var(--danger);
+            border-color: rgba(255, 123, 123, 0.2);
+            background: rgba(255, 123, 123, 0.08);
+        }
+
+        .notice.success {
+            color: var(--success);
+            border-color: rgba(121, 226, 155, 0.2);
+            background: rgba(121, 226, 155, 0.08);
+        }
+
+        .composer,
+        .editor,
+        .post-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 22px;
+            border-radius: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.26);
+        }
+
+        .composer-grid,
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #d8e1ee;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            border-radius: 14px;
+            padding: 14px 15px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: rgba(109, 213, 255, 0.7);
+            box-shadow: 0 0 0 4px rgba(109, 213, 255, 0.12);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .post-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .empty-state {
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px dashed rgba(255, 255, 255, 0.14);
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .post-card h2,
+        .post-card h3 {
+            margin-top: 0;
+        }
+
+        .post-meta,
+        .post-submeta {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 0;
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .post-content {
+            line-height: 1.8;
+            color: #e6ebf3;
+            white-space: pre-wrap;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 360px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 12px 0 16px;
+        }
+
+        .heart-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(116, 216, 255, 0.12);
+            color: #dff7ff;
+            border: 1px solid rgba(116, 216, 255, 0.18);
+        }
+
+        .heart-button.active {
+            background: rgba(121, 226, 155, 0.14);
+            color: #d7ffe5;
+            border-color: rgba(121, 226, 155, 0.18);
+        }
+
+        .comment-section {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .comment-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .comment-item {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .comment-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .comment-content {
+            white-space: pre-wrap;
+            line-height: 1.7;
+            color: #e6ebf3;
+            margin: 0;
+        }
+
+        .comment-form textarea {
+            min-height: 96px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .password-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 22px;
+            border-radius: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.26);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .note-box {
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px 18px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 820px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .userbox {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .composer-grid,
+            .editor-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <div class="brand">
+                <h1>BloGoneuk</h1>
+                <p>고늑블로그</p>
+            </div>
+            <div class="userbox">
+                <div class="user-chip" id="userChip">확인 중...</div>
+                <button class="logout-button" id="logoutButton" type="button">로그아웃</button>
+            </div>
+        </header>
+
+        <main id="mainContent" class="hidden">
+            <section class="notice">
+                로그인한 사용자만 접근할 수 있습니다.
+            </section>
+
+            <article class="composer">
+                <h2>게시물 작성</h2>
+                <p class="post-meta">카테고리는 게임, 독서, PPT, 컴퓨터, 일기, 발표, 일반만 사용할 수 있습니다.</p>
+                <form id="postForm">
+                    <div class="composer-grid">
+                        <div class="field">
+                            <label for="postTitle">제목</label>
+                            <input id="postTitle" name="postTitle" type="text" placeholder="예: 오늘의 기록" maxlength="80" required>
+                        </div>
+                        <div class="field">
+                            <label for="postCategory">카테고리</label>
+                            <select id="postCategory" name="postCategory" required>
+                                <option value="게임">게임</option>
+                                <option value="독서">독서</option>
+                                <option value="PPT">PPT</option>
+                                <option value="컴퓨터">컴퓨터</option>
+                                <option value="일기">일기</option>
+                                <option value="발표">발표</option>
+                                <option value="일반" selected>일반</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="postContent">내용</label>
+                        <textarea id="postContent" name="postContent" placeholder="게시물을 작성하세요." maxlength="3000" required></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="postImage">이미지 업로드</label>
+                        <input id="postImage" name="postImage" type="file" accept="image/*">
+                        <p class="post-submeta">최대 8MB까지 업로드할 수 있습니다.</p>
+                    </div>
+                    <div class="actions">
+                        <button class="primary-button" type="submit">게시물 올리기</button>
+                    </div>
+                </form>
+                <div class="notice hidden" id="postNotice" style="margin-bottom: 0; margin-top: 16px;"></div>
+            </article>
+
+            <article class="password-card">
+                <h2>비밀번호 변경</h2>
+                <p class="post-meta">현재 비밀번호를 확인한 뒤 새 비밀번호 해시를 다시 만듭니다.</p>
+                <form id="passwordForm">
+                    <div class="composer-grid">
+                        <div class="field">
+                            <label for="currentPassword">현재 비밀번호</label>
+                            <input id="currentPassword" name="currentPassword" type="password" required>
+                        </div>
+                        <div class="field">
+                            <label for="newPassword">새 비밀번호</label>
+                            <input id="newPassword" name="newPassword" type="password" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="newPasswordConfirm">새 비밀번호 확인</label>
+                        <input id="newPasswordConfirm" name="newPasswordConfirm" type="password" required>
+                    </div>
+                    <div class="actions">
+                        <button class="primary-button" type="submit">비밀번호 변경</button>
+                    </div>
+                </form>
+                <div class="notice hidden" id="passwordNotice" style="margin-bottom: 0; margin-top: 16px;"></div>
+            </article>
+
+            <article class="editor hidden" id="editorPanel">
+                <h2>게시물 수정</h2>
+                <p class="post-submeta">내가 작성한 게시물만 수정할 수 있습니다.</p>
+                <form id="editForm">
+                    <div class="editor-grid">
+                        <div class="field">
+                            <label for="editTitle">제목</label>
+                            <input id="editTitle" name="editTitle" type="text" maxlength="80" required>
+                        </div>
+                        <div class="field">
+                            <label for="editCategory">카테고리</label>
+                            <select id="editCategory" name="editCategory" required>
+                                <option value="게임">게임</option>
+                                <option value="독서">독서</option>
+                                <option value="PPT">PPT</option>
+                                <option value="컴퓨터">컴퓨터</option>
+                                <option value="일기">일기</option>
+                                <option value="발표">발표</option>
+                                <option value="일반">일반</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="editContent">내용</label>
+                        <textarea id="editContent" name="editContent" maxlength="3000" required></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="editImage">이미지 교체</label>
+                        <input id="editImage" name="editImage" type="file" accept="image/*">
+                        <p class="post-submeta">새 이미지를 선택하지 않으면 기존 이미지를 유지합니다. 최대 8MB까지 업로드할 수 있습니다.</p>
+                    </div>
+                    <div class="actions">
+                        <button class="primary-button" type="submit">수정 저장</button>
+                        <button class="danger-button" id="cancelEditButton" type="button">수정 취소</button>
+                    </div>
+                </form>
+                <div class="notice hidden" id="editNotice" style="margin-bottom: 0; margin-top: 16px;"></div>
+            </article>
+
+            <article class="post-card">
+                <h2>게시물 목록</h2>
+                <p class="post-meta">최신 게시물이 위에 표시됩니다.</p>
+                <div class="post-list" id="postList"></div>
+            </article>
+
+            <article class="post-card">
+                <h2>예정 기능</h2>
+                <p class="post-meta">회원 기능 기반</p>
+                <div class="note-box">
+                    프로필 기능은 추가되지 않을 예정입니다. 프로필 수정이 필요하다면 운영자에게 직접 수정을 요청해 주세요.
+                </div>
+                <div class="note-box" style="margin-top: 12px;">
+                    예정 기능: 게시물 검색
+                </div>
+            </article>
+        </main>
+    </div>
+
+    <script>
+        const apiBase = "";
+        const mainContent = document.getElementById("mainContent");
+        const userChip = document.getElementById("userChip");
+        const logoutButton = document.getElementById("logoutButton");
+        const postForm = document.getElementById("postForm");
+        const postTitle = document.getElementById("postTitle");
+        const postCategory = document.getElementById("postCategory");
+        const postContent = document.getElementById("postContent");
+        const postImage = document.getElementById("postImage");
+        const postNotice = document.getElementById("postNotice");
+        const passwordForm = document.getElementById("passwordForm");
+        const currentPassword = document.getElementById("currentPassword");
+        const newPassword = document.getElementById("newPassword");
+        const newPasswordConfirm = document.getElementById("newPasswordConfirm");
+        const passwordNotice = document.getElementById("passwordNotice");
+        const postList = document.getElementById("postList");
+        const editorPanel = document.getElementById("editorPanel");
+        const editForm = document.getElementById("editForm");
+        const editTitle = document.getElementById("editTitle");
+        const editCategory = document.getElementById("editCategory");
+        const editContent = document.getElementById("editContent");
+        const editImage = document.getElementById("editImage");
+        const editNotice = document.getElementById("editNotice");
+        const cancelEditButton = document.getElementById("cancelEditButton");
+
+        const allowedCategories = ["게임", "독서", "PPT", "컴퓨터", "일기", "발표", "일반"];
+        let currentUser = null;
+        let currentEditPostId = null;
+
+        function setNotice(element, message, type) {
+            element.textContent = message;
+            element.className = `notice ${type || ""}`.trim();
+            element.classList.remove("hidden");
+        }
+
+        function hideNotice(element) {
+            element.textContent = "";
+            element.className = "notice hidden";
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return new Intl.DateTimeFormat("ko-KR", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }).format(date);
+        }
+
+        function renderCategoryOptions(selectedCategory) {
+            return allowedCategories.map((category) => {
+                const selected = category === selectedCategory ? "selected" : "";
+                return `<option value="${category}" ${selected}>${category}</option>`;
+            }).join("");
+        }
+
+        function getHeartCount(post) {
+            return Array.isArray(post.hearts) ? post.hearts.length : 0;
+        }
+
+        function hasHearted(post) {
+            return Array.isArray(post.hearts) && currentUser ? post.hearts.includes(currentUser.username) : false;
+        }
+
+        function renderComment(comment, post) {
+            const canDeleteComment = currentUser && (comment.authorUsername === currentUser.username || post.authorUsername === currentUser.username);
+            const deleteButton = canDeleteComment ? `<button class="danger-button" type="button" data-delete-comment-id="${comment.id}" data-delete-comment-post-id="${post.id}">삭제</button>` : "";
+
+            return `
+                <div class="comment-item">
+                    <div class="comment-meta">
+                        <strong>${escapeHtml(comment.authorName || comment.authorUsername || "익명")}</strong>
+                        <span>${formatDate(comment.createdAt)}</span>
+                        ${deleteButton}
+                    </div>
+                    <p class="comment-content">${escapeHtml(comment.content)}</p>
+                </div>
+            `;
+        }
+
+        function renderPost(post) {
+            const canEdit = currentUser && post.authorUsername === currentUser.username;
+            const heartActive = hasHearted(post) ? "active" : "";
+            const heartLabel = hasHearted(post) ? "하트 취소" : "하트";
+            const updatedAt = post.updatedAt && post.updatedAt !== post.createdAt ? `<span>수정됨: ${formatDate(post.updatedAt)}</span>` : "";
+            const imageBlock = post.image && post.image.dataUrl ? `<img class="post-image" src="${post.image.dataUrl}" alt="${escapeHtml(post.title)} 이미지">` : "";
+            const comments = Array.isArray(post.comments) ? post.comments : [];
+            const commentsMarkup = comments.length
+                ? comments.map((comment) => renderComment(comment, post)).join("")
+                : '<div class="empty-state">아직 댓글이 없습니다. 첫 댓글을 남겨보세요.</div>';
+
+            const actionButtons = canEdit ? `
+                <div class="post-actions">
+                    <button class="primary-button" type="button" data-edit-post-id="${post.id}">수정</button>
+                    <button class="danger-button" type="button" data-delete-post-id="${post.id}">삭제</button>
+                </div>
+            ` : "";
+
+            return `
+                <article class="post-card" style="margin-bottom: 0;" data-post-id="${post.id}">
+                    <h3>${escapeHtml(post.title)}</h3>
+                    <div class="meta-row">
+                        <span>작성자: ${escapeHtml(post.authorName || post.authorUsername || "익명")}</span>
+                        <span>카테고리: ${escapeHtml(post.category || "일반")}</span>
+                        <span>작성: ${formatDate(post.createdAt)}</span>
+                        ${updatedAt}
+                    </div>
+                    ${imageBlock}
+                    <p class="post-content">${escapeHtml(post.content)}</p>
+                    <div class="post-actions">
+                        <button class="heart-button ${heartActive}" type="button" data-heart-post-id="${post.id}">${heartLabel} ${getHeartCount(post)}</button>
+                    </div>
+                    ${actionButtons}
+                    <section class="comment-section">
+                        <h4 style="margin: 0 0 10px;">댓글 ${comments.length}</h4>
+                        <form class="comment-form" data-comment-form-post-id="${post.id}">
+                            <div class="field" style="margin-bottom: 0;">
+                                <label for="comment-${post.id}">댓글 작성</label>
+                                <textarea id="comment-${post.id}" name="comment" placeholder="댓글을 남겨보세요." maxlength="1000" required></textarea>
+                            </div>
+                            <div class="comment-actions">
+                                <button class="primary-button" type="submit">댓글 등록</button>
+                            </div>
+                        </form>
+                        <div class="comment-list">
+                            ${commentsMarkup}
+                        </div>
+                    </section>
+                </article>
+            `;
+        }
+
+        async function fetchCurrentUser() {
+            const response = await fetch(`${apiBase}/api/me`, { credentials: "include" });
+            if (!response.ok) {
+                window.location.replace("index.html");
+                return null;
+            }
+
+            const body = await response.json();
+            return body.user;
+        }
+
+        async function loadPosts() {
+            postList.innerHTML = '<div class="empty-state">게시물을 불러오는 중입니다.</div>';
+
+            try {
+                const response = await fetch(`${apiBase}/api/posts`, { credentials: "include" });
+                if (response.status === 401) {
+                    window.location.replace("index.html");
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("게시물을 불러오지 못했습니다.");
+                }
+
+                const posts = await response.json();
+
+                if (!posts.length) {
+                    postList.innerHTML = '<div class="empty-state">아직 작성된 게시물이 없습니다. 첫 게시물을 올려보세요.</div>';
+                    return;
+                }
+
+                postList.innerHTML = posts.map((post) => renderPost(post)).join("");
+
+                document.querySelectorAll("[data-edit-post-id]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        const postId = button.getAttribute("data-edit-post-id");
+                        const post = posts.find((item) => item.id === postId);
+                        if (post) {
+                            openEditor(post);
+                        }
+                    });
+                });
+
+                document.querySelectorAll("[data-delete-post-id]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        const postId = button.getAttribute("data-delete-post-id");
+                        deletePost(postId);
+                    });
+                });
+
+                document.querySelectorAll("[data-heart-post-id]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        const postId = button.getAttribute("data-heart-post-id");
+                        toggleHeart(postId);
+                    });
+                });
+
+                document.querySelectorAll("[data-comment-form-post-id]").forEach((form) => {
+                    form.addEventListener("submit", (event) => {
+                        event.preventDefault();
+                        const postId = form.getAttribute("data-comment-form-post-id");
+                        const textarea = form.querySelector("textarea[name='comment']");
+                        submitComment(postId, textarea);
+                    });
+                });
+
+                document.querySelectorAll("[data-delete-comment-id]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        const postId = button.getAttribute("data-delete-comment-post-id");
+                        const commentId = button.getAttribute("data-delete-comment-id");
+                        deleteComment(postId, commentId);
+                    });
+                });
+            } catch (error) {
+                postList.innerHTML = '<div class="empty-state">게시물 목록을 불러오지 못했습니다.</div>';
+            }
+        }
+
+        function openEditor(post) {
+            currentEditPostId = post.id;
+            editTitle.value = post.title;
+            editCategory.innerHTML = renderCategoryOptions(allowedCategories.includes(post.category) ? post.category : "일반");
+            editContent.value = post.content;
+            editorPanel.classList.remove("hidden");
+            setNotice(editNotice, "게시물을 수정할 수 있습니다.", "");
+            editorPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function closeEditor() {
+            currentEditPostId = null;
+            editForm.reset();
+            editImage.value = "";
+            hideNotice(editNotice);
+            editorPanel.classList.add("hidden");
+        }
+
+        async function toggleHeart(postId) {
+            try {
+                const response = await fetch(`${apiBase}/api/posts/${postId}/hearts`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(body.error || "하트를 처리하지 못했습니다.");
+                }
+
+                setNotice(postNotice, "하트가 반영되었습니다.", "success");
+                await loadPosts();
+            } catch (error) {
+                setNotice(postNotice, error.message || "하트를 처리하지 못했습니다.", "error");
+            }
+        }
+
+        async function submitComment(postId, textarea) {
+            const content = textarea.value.trim();
+            if (!content) {
+                setNotice(postNotice, "댓글 내용을 입력하세요.", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/api/posts/${postId}/comments`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({ content })
+                });
+
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(body.error || "댓글을 저장하지 못했습니다.");
+                }
+
+                textarea.value = "";
+                setNotice(postNotice, "댓글이 등록되었습니다.", "success");
+                await loadPosts();
+            } catch (error) {
+                setNotice(postNotice, error.message || "댓글을 저장하지 못했습니다.", "error");
+            }
+        }
+
+        async function deleteComment(postId, commentId) {
+            const confirmed = window.confirm("정말 이 댓글을 삭제할까요?");
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/api/posts/${postId}/comments/${commentId}`, {
+                    method: "DELETE",
+                    credentials: "include"
+                });
+
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(body.error || "댓글을 삭제하지 못했습니다.");
+                }
+
+                setNotice(postNotice, "댓글이 삭제되었습니다.", "success");
+                await loadPosts();
+            } catch (error) {
+                setNotice(postNotice, error.message || "댓글을 삭제하지 못했습니다.", "error");
+            }
+        }
+
+        passwordForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const currentValue = currentPassword.value;
+            const newValue = newPassword.value;
+            const confirmValue = newPasswordConfirm.value;
+
+            if (newValue.length < 6) {
+                setNotice(passwordNotice, "새 비밀번호는 6자 이상이어야 합니다.", "error");
+                return;
+            }
+
+            if (newValue !== confirmValue) {
+                setNotice(passwordNotice, "새 비밀번호 확인이 일치하지 않습니다.", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/api/change-password`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        currentPassword: currentValue,
+                        newPassword: newValue
+                    })
+                });
+
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(body.error || "비밀번호를 변경하지 못했습니다.");
+                }
+
+                passwordForm.reset();
+                setNotice(passwordNotice, "비밀번호가 변경되었습니다. 다음 로그인부터 새 비밀번호를 사용하세요.", "success");
+            } catch (error) {
+                setNotice(passwordNotice, error.message || "비밀번호를 변경하지 못했습니다.", "error");
+            }
+        });
+
+        async function deletePost(postId) {
+            const confirmed = window.confirm("정말 이 게시물을 삭제할까요?");
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/api/posts/${postId}`, {
+                    method: "DELETE",
+                    credentials: "include"
+                });
+
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(body.error || "게시물을 삭제하지 못했습니다.");
+                }
+
+                setNotice(postNotice, "게시물이 삭제되었습니다.", "success");
+                await loadPosts();
+            } catch (error) {
+                setNotice(postNotice, error.message || "게시물을 삭제하지 못했습니다.", "error");
+            }
+        }
+
+        postForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const title = postTitle.value.trim();
+            const content = postContent.value.trim();
+            const category = postCategory.value;
+            const imageFile = postImage.files[0] || null;
+
+            if (!title || !content) {
+                setNotice(postNotice, "제목과 내용을 모두 입력하세요.", "error");
+                return;
+            }
+
+            if (imageFile && imageFile.size > 8 * 1024 * 1024) {
+                setNotice(postNotice, "이미지 파일은 최대 8MB까지만 업로드할 수 있습니다.", "error");
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append("title", title);
+                formData.append("content", content);
+                formData.append("category", category);
+                if (imageFile) {
+                    formData.append("image", imageFile);
+                }
+
+                const response = await fetch(`${apiBase}/api/posts`, {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                });
+
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(body.error || "게시물을 저장하지 못했습니다.");
+                }
+
+                postForm.reset();
+                postCategory.value = "일반";
+                setNotice(postNotice, "게시물이 등록되었습니다.", "success");
+                await loadPosts();
+            } catch (error) {
+                setNotice(postNotice, error.message || "게시물을 저장하지 못했습니다.", "error");
+            }
+        });
+
+        editForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            if (!currentEditPostId) {
+                setNotice(editNotice, "수정할 게시물을 선택하세요.", "error");
+                return;
+            }
+
+            const title = editTitle.value.trim();
+            const content = editContent.value.trim();
+            const category = editCategory.value;
+            const imageFile = editImage.files[0] || null;
+
+            if (!title || !content) {
+                setNotice(editNotice, "제목과 내용을 모두 입력하세요.", "error");
+                return;
+            }
+
+            if (imageFile && imageFile.size > 8 * 1024 * 1024) {
+                setNotice(editNotice, "이미지 파일은 최대 8MB까지만 업로드할 수 있습니다.", "error");
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append("title", title);
+                formData.append("content", content);
+                formData.append("category", category);
+                if (imageFile) {
+                    formData.append("image", imageFile);
+                }
+
+                const response = await fetch(`${apiBase}/api/posts/${currentEditPostId}`, {
+                    method: "PUT",
+                    credentials: "include",
+                    body: formData
+                });
+
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(body.error || "게시물을 수정하지 못했습니다.");
+                }
+
+                setNotice(editNotice, "게시물이 수정되었습니다.", "success");
+                currentEditPostId = null;
+                await loadPosts();
+                closeEditor();
+            } catch (error) {
+                setNotice(editNotice, error.message || "게시물을 수정하지 못했습니다.", "error");
+            }
+        });
+
+        cancelEditButton.addEventListener("click", () => {
+            closeEditor();
+        });
+
+        logoutButton.addEventListener("click", async () => {
+            try {
+                await fetch(`${apiBase}/api/logout`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+            } finally {
+                window.location.href = "index.html";
+            }
+        });
+
+        (async () => {
+            currentUser = await fetchCurrentUser();
+            if (!currentUser) {
+                return;
+            }
+
+            userChip.textContent = `${currentUser.name} 님`;
+            mainContent.classList.remove("hidden");
+            await loadPosts();
+        })();
+    </script>
+</body>
+</html>
